@@ -60,7 +60,7 @@ def realistic_game_placing(n=100, p=4):
     return scores / n
 
 def visualize_realistic_game_placing():
-    scores = realistic_game_placing(100, 4)
+    scores = realistic_game_placing(100, 6)
     
     fig, ax = plt.subplots()
     labels = [pl.__name__ for pl in ALL_PLAYER_TYPES]

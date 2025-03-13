@@ -3,10 +3,10 @@ class Card():
     value: int
 
     def __init__(self, number, value):
-        self.number = number
-        self.value = value
+        self.number = number # number written on it
+        self.value = value   # penalty value
 
-    def __lt__(self, other):
+    def __lt__(self, other): # compare based on the number
         return self.number < other.number
 
     def __repr__(self):
@@ -14,6 +14,7 @@ class Card():
     
     def __sub__(self, other) -> int:
         return self.number - other.number
+    
     @staticmethod
     def get_value(number: int):
         if number == 55:
@@ -26,5 +27,6 @@ class Card():
             return 2
         return 1
     
-    def full_deck():
+    @staticmethod
+    def full_deck() -> list:
         return [Card(i, Card.get_value(i)) for i in range(1, 105)]

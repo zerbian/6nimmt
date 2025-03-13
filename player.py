@@ -1,27 +1,29 @@
+from typing import final
+
 from card import Card
 from board import Board
 import random
 
-import numpy as np
 
 class Player():
+    """Base player"""
     hand: list[Card]
     penalty: list[Card]
-
-    def __repr__(self):
-        "BasePlayer"
-
+ 
     def setHand(self, hand: list[Card]):
         self.hand = hand
         self.hand.sort()
         self.penalty = []
 
+    @final
     def collect_penalty(self, penalty: list[Card]):
         self.penalty.extend(penalty)
 
+    @final
     def get_penalty(self):
         return sum([card.value for card in self.penalty])
     
+    @final
     def reset(self):
         self.hand.clear()
         self.penalty.clear()
@@ -37,6 +39,7 @@ class Player():
         return random.randint(0, 3)
 
 class DumbPlayer(Player):
+    """Maximize penalty by taking columns with the maximum number of penalty points"""
     def column_selection(self, board: Board, selected_cards: list[Card]) -> int:
         idx = 0
         max_penalty = 0
@@ -48,10 +51,7 @@ class DumbPlayer(Player):
         return idx
 
 class BasicPlayer(Player):
-
-    def __repr__(self):
-        return "Basic Player"
-    
+    """Minimize penalty by taking columns with minimum penalty"""  
     def column_selection(self, board: Board, selected_cards: list[Card]) -> int:
         idx = 0
         min_penalty = 1000
@@ -64,6 +64,7 @@ class BasicPlayer(Player):
 
     
 class NoPenaltyPlayer(BasicPlayer):
+    """Only play cards that dont produce penalty points"""
     def card_selection(self, board: Board):
         cards_wo_penalty = []
 
@@ -77,24 +78,22 @@ class NoPenaltyPlayer(BasicPlayer):
         if len(cards_wo_penalty) > 0:
             return self.hand.pop(random.choice(cards_wo_penalty))
         
+        # if all cards are "bad", use super class strategy
         return super().card_selection(board)
 
 class IncPlayer(NoPenaltyPlayer):
-    def __repr__(self):
-        return "Increment Player"
-
+    """Play cards with increasing value"""
     def card_selection(self, board):
         card = self.hand.pop(0)
         return card
     
 class DecPlayer(NoPenaltyPlayer):
-    def __repr__(self):
-        return "Decrement Player"
-
+    """Play cards by decreasing value"""
     def card_selection(self, board):
         return self.hand.pop(-1)
 
 class BestFitPlayer(NoPenaltyPlayer):
+    """If we have a card that directly fits, play that"""
     def card_selection(self, board):
         for card_id, card in enumerate(self.hand):
             col_idx = board.check_next_spot(card)
@@ -104,10 +103,12 @@ class BestFitPlayer(NoPenaltyPlayer):
             diff = card - board.columns[col_idx][-1]
             if diff == 1:
                 return self.hand.pop(card_id)
-
+            
+        # revert to super class strategy
         return super().card_selection(board)
     
-class NearlyFitPlayer(IncPlayer):
+class NearlyFitPlayer(NoPenaltyPlayer):
+    """Also play cards that are approximately fit"""
     def card_selection(self, board):
         for card_idx, card in enumerate(self.hand):
             col_idx = board.check_next_spot(card)
@@ -122,6 +123,7 @@ class NearlyFitPlayer(IncPlayer):
     
 
 class AltPlayer(BasicPlayer):
+    """Alternate playing high and low cards"""
     highest = True
 
     def card_selection(self, board):
@@ -130,9 +132,10 @@ class AltPlayer(BasicPlayer):
         return self.hand.pop(idx)
 
 class LowHighMidllePlayer(BasicPlayer):
+    """Play low cards first, then high cards and then middle"""
     turn = 0
-
     def card_selection(self, board):
+        self.turn += 1
         if self.turn in range(0, 4):
             return self.hand.pop(0)
         
@@ -142,6 +145,5 @@ class LowHighMidllePlayer(BasicPlayer):
         else:
             return self.hand.pop(-1)
 
-
-
+# Add new player types here
 ALL_PLAYER_TYPES = [Player, BasicPlayer, IncPlayer, DecPlayer, AltPlayer, LowHighMidllePlayer, NoPenaltyPlayer, BestFitPlayer, NearlyFitPlayer,]
