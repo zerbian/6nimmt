@@ -11,21 +11,21 @@ import arena
 from player import ALL_PLAYER_TYPES
 
 
-def two_players_relative_scores():
+def two_players_relative_scores(n, p):
     N = len(ALL_PLAYER_TYPES)
     m = np.zeros((N, N))
 
     for a,b in tqdm(list(itertools.combinations(range(N),2))):
         p1 = ALL_PLAYER_TYPES[a]
         p2 = ALL_PLAYER_TYPES[b]
-        res = arena.full_rounds_two_player(p1(), p2(), 100, 6)
+        res = arena.full_rounds_two_player(p1(), p2(), n, p)
         m[b,a] = -res
         m[a,b] = res
 
     return m
 
-def visualize_two_players_relative_scores():
-    res = two_players_relative_scores()
+def visualize_two_players_relative_scores(n: int, p: int):
+    res = two_players_relative_scores(n, p)
     N = len(ALL_PLAYER_TYPES)
     
     fig, ax = plt.subplots()
@@ -59,8 +59,8 @@ def realistic_game_placing(n=100, p=4):
 
     return scores / n
 
-def visualize_realistic_game_placing():
-    scores = realistic_game_placing(100, 6)
+def visualize_realistic_game_placing(n: int, p: int):
+    scores = realistic_game_placing(n, p)
     
     fig, ax = plt.subplots()
     labels = [pl.__name__ for pl in ALL_PLAYER_TYPES]
@@ -73,12 +73,14 @@ def visualize_realistic_game_placing():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("type", choices=["2p_rel", "g_pos"])
+    parser.add_argument("-n", type=int, help="Rounds played", default=100)
+    parser.add_argument("-p", type=int, help="Number of players", default=4)
     args = parser.parse_args()
 
     match args.type:
         case "2p_rel":
-            visualize_two_players_relative_scores()
+            visualize_two_players_relative_scores(n=args.n, p=args.p)
         case "g_pos":
-            visualize_realistic_game_placing()
+            visualize_realistic_game_placing(n=args.n, p=args.p)
 
     
