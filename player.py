@@ -15,6 +15,9 @@ class Player():
         self.hand.sort()
         self.penalty = []
 
+    def seen_hand_cards(cards: list[Card]) -> None:
+        pass
+
     @final
     def collect_penalty(self, penalty: list[Card]):
         self.penalty.extend(penalty)
@@ -23,7 +26,6 @@ class Player():
     def get_penalty(self):
         return sum([card.value for card in self.penalty])
     
-    @final
     def reset(self):
         self.hand.clear()
         self.penalty.clear()

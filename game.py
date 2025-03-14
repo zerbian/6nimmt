@@ -35,6 +35,9 @@ class Game():
         card_choices = [(pl.card_selection(self.board), pl) for pl in self.players]
         card_choices.sort(key=lambda x : x[0].number) # sort them by card value
 
+        for player in self.players:
+            player.seen_hand_cards(card_choices)
+
         # resolve each players choice to the board
         for card, player in card_choices:
             penalty = None
