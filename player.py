@@ -15,7 +15,7 @@ class Player():
         self.hand.sort()
         self.penalty = []
 
-    def seen_hand_cards(cards: list[Card]) -> None:
+    def seen_hand_cards(self, cards: list[Card]) -> None:
         pass
 
     @final
